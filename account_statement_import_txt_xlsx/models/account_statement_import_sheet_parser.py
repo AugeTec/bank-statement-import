@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import itertools
+import locale
 import logging
 from datetime import datetime
 from decimal import Decimal
@@ -300,7 +301,7 @@ class AccountStatementImportSheetParser(models.TransientModel):
                 continue
 
             if isinstance(timestamp, str):
-                timestamp = datetime.strptime(timestamp, mapping.timestamp_format)
+                timestamp = self._parse_timestamp(mapping, timestamp)
 
             if balance:
                 balance = self._parse_decimal(balance, mapping)
@@ -422,6 +423,22 @@ class AccountStatementImportSheetParser(models.TransientModel):
             transaction["account_number"] = bank_account
 
         return [transaction]
+
+    @api.model
+    def _parse_timestamp(self, mapping, timestamp):
+        current_locale = locale.getlocale(locale.LC_TIME)
+        try:
+            if mapping.timestamp_locale:
+                locale.setlocale(locale.LC_TIME, mapping.timestamp_locale)
+            timestamp = datetime.strptime(timestamp, mapping.timestamp_format)
+        except BaseException:
+            _logger.warning("Timestamp parsing error", exc_info=True)
+            raise
+        finally:
+            locale.setlocale(locale.LC_TIME, current_locale)
+
+
+        return timestamp
 
     @api.model
     def _parse_decimal(self, value, mapping):

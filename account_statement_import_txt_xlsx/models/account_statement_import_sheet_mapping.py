@@ -54,6 +54,10 @@ class AccountStatementImportSheetMapping(models.Model):
         default="comma",
     )
     quotechar = fields.Char(string="Text qualifier", size=1, default='"')
+    timestamp_locale = fields.Char(
+        string="Timestamp locale",
+        help="Locale to use when parsing the timestamp",
+    )
     timestamp_format = fields.Char(required=True)
     no_header = fields.Boolean(
         string="File does not contain header line",

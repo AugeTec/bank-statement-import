@@ -37,6 +37,7 @@
                             <field name="quotechar" />
                         </group>
                         <group>
+                            <field name="timestamp_locale" />
                             <field name="timestamp_format" />
                         </group>
                         <group>
